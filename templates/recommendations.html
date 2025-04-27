@@ -1,181 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- Link Google Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-        <!-- Judul Halaman (bisa dinamis seperti ini) -->
-        <title>Mood Melodies - Recommendations for {{ selected_mood or '...' }}</title>
-        <!-- Link ke file CSS Eksternal -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    </head>
-<body>
-    <div class="container">
-        <h1>Mood Melodies</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mood Melodies - Recommendations for {{ selected_mood or '...' }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1",
+              secondary: "#8b5cf6",
+              accent: "#d946ef",
+              happy: "#fbbf24",
+              sad: "#60a5fa",
+              energetic: "#f43f5e",
+              calm: "#10b981",
+              focused: "#8b5cf6",
+            },
+            fontFamily: {
+              poppins: ["Poppins", "sans-serif"],
+              montserrat: ["Montserrat", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style type="text/css">
+      @keyframes gradient-animation {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .gradient-bg {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient-animation 15s ease infinite;
+      }
+      .spotify-hover { transition: all 0.2s ease; }
+      .spotify-hover:hover { transform: scale(1.2); }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #c7d2fe;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #6366f1;
+      }
+      .recommendation-row { transition: all 0.2s ease; }
+      .recommendation-row:hover { background-color: rgba(99, 102, 241, 0.1); }
+    </style>
+  </head>
+  <body class="gradient-bg min-h-screen font-poppins text-gray-800 p-4">
+    <div class="container max-w-full mx-auto bg-white bg-opacity-80 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8 transform transition-all duration-500">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-montserrat">Mood Melodies</h1>
 
         {% if error %}
-            <h2>Oops!</h2>
-            <p class="error-message">{{ error }}</p>
+        <div class="mt-8 p-6 bg-red-50 rounded-xl border border-red-200">
+          <h2 class="text-2xl font-semibold text-red-600 mb-2">Error</h2>
+          <p class="text-red-500">{{ error }}</p>
+          <p class="text-red-500 mt-2">Please try another mood or contact support.</p>
+        </div>
+
         {% elif recommendations is not none and not recommendations.empty %}
-            <h2>Recommendations for: {{ selected_mood }}</h2>
-            <p>Here are some tracks that might fit your mood:</p>
-            <table class="recommendations-table">
-                <thead>
-                    <tr>
-                        <th>Track Name</th>
-                        <th>Artist(s)</th>
-                        <th>Album</th>
-                        <th>Genre</th>
-                        <th>Popularity</th>
-                    </tr>
-                </thead>
-                <!-- Tambahkan ID ke tbody untuk target JavaScript -->
-                <tbody id="recommendations-tbody">
-                    {% for index, row in recommendations.iterrows() %}
-                    <tr>
-                        <!-- Modifikasi sel nama lagu -->
-                        <td class="track-cell" title="{{ row['track_name'] }}"> <!-- Tambahkan title untuk tooltip -->
-                            <span>{{ row['track_name'] }}</span>
-<!-- Tautan Spotify dengan ikon PNG -->
-<a href="https://open.spotify.com/track/{{ row['track_id'] }}" target="_blank" class="spotify-link spotify-icon-link" title="Listen on Spotify">
-    <!-- Path sudah diperbaiki ke folder icons -->
-    <img src="{{ url_for('static', filename='icons/spotify_icon.png') }}" alt="Listen on Spotify" class="spotify-png-icon">
-</a>
-                        </td>
-                        <td>{{ row['artists'] }}</td>
-                        <td>{{ row['album_name'] }}</td>
-                        <td>{{ row['track_genre'] }}</td>
-                        <td>{{ row['popularity'] }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="flex items-center justify-center gap-3 mb-2">
+          <h2 class="text-2xl font-semibold">Recommendations For:</h2>
+          <span class="px-4 py-1 bg-{{ selected_mood.lower() }} bg-opacity-20 rounded-full font-medium">{{ selected_mood }}</span>
+        </div>
+        <p class="text-gray-600 mb-6">Here are some tracks that might fit your mood.</p>
 
-            <!-- Tombol Show More (hanya tampil jika show_more=True) -->
-            {% if show_more %}
-            <div class="show-more-container">
-                <button id="show-more-btn" data-mood="{{ selected_mood }}" data-offset="{{ initial_count }}" data-batch-size="{{ load_more_count }}">
-                    Show More
-                </button>
-            </div>
-            {% endif %}
+        <div class="overflow-x-auto custom-scrollbar rounded-xl shadow-lg border border-gray-100">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-gradient-to-r from-primary/10 to-accent/10 text-gray-700">
+                <th class="px-4 py-3 font-semibold rounded-tl-xl">Track Name</th>
+                <th class="px-4 py-3 font-semibold">Artist(s)</th>
+                <th class="px-4 py-3 font-semibold предприятия hidden md:table-cell">Album</th>
+                <th class="px-4 py-3 font-semibold hidden lg:table-cell">Genre</th>
+                <th class="px-4 py-3 font-semibold text-center rounded-tr-xl">Popularity</th>
+              </tr>
+            </thead>
+            <tbody id="recommendations-tbody">
+              {% for index, row in recommendations.iterrows() %}
+              <tr class="recommendation-row border-b border-gray-100 last:border-0">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 truncate" title="{{ row['track_name'] }}">{{ row['track_name'] }}</div>
+                    <a href="https://open.spotify.com/track/{{ row['track_id'] }}" target="_blank" class="spotify-hover flex-shrink-0" title="Listen on Spotify">
+                      <img src="{{ url_for('static', filename='icons/spotify_icon.png') }}" alt="Spotify" class="w-5 h-5 object-contain" />
+                    </a>
+                  </div>
+                </td>
+                <td class="px-4 py-3 truncate">{{ row['artists'] }}</td>
+                <td class="px-4 py-3 truncate hidden md:table-cell">{{ row['album_name'] }}</td>
+                <td class="px-4 py-3 truncate hidden lg:table-cell">{{ row['track_genre'] }}</td>
+                <td class="px-4 py-3 text-center">
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary bg-opacity-10 text-primary">{{ row['popularity'] }}</div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
 
-        {% elif selected_mood %}
-             <!-- Kasus fallback jika recommendations None tapi tidak ada error -->
-             <h2>No Recommendations Found</h2>
-             <p>We couldn't find any suitable tracks for the mood '{{ selected_mood }}' right now.</p>
+        {% if show_more %}
+        <div class="mt-6">
+          <button id="show-more-btn" data-mood="{{ selected_mood }}" data-offset="{{ initial_count }}" data-batch-size="{{ load_more_count }}" class="px-12 py-2 mt-6 bg-gradient-to-r from-primary to-accent text-white font-medium rounded-full shadow-md hover:shadow-lg transform transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" aria-label="Load more recommendations for {{ selected_mood }}">Show More</button>
+        </div>
         {% endif %}
 
-        <div class="back-link">
-            <a href="{{ url_for('index') }}">← Choose another mood</a>
+        {% elif selected_mood %}
+        <div class="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
+          <h2 class="text-2xl font-semibold text-blue-600 mb-2">No Recommendations Found</h2>
+          <p class="text-blue-500">No tracks found for '{{ selected_mood }}'. Try another mood or search for a song.</p>
         </div>
+        {% endif %}
+
+        <div class="mt-8">
+          <a href="{{ url_for('index') }}" class="inline-flex items-center px-5 py-2 bg-white text-primary border border-primary rounded-full shadow-sm hover:bg-primary hover:text-white transition-all duration-300 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Choose another mood
+          </a>
+        </div>
+      </div>
     </div>
 
-    <!-- JavaScript untuk Show More -->
+    <!-- Loading Animation -->
+    <div id="loading-animation" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+      <div class="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-3"></div>
+        <p class="text-gray-700">Loading more songs...</p>
+      </div>
+    </div>
+
     <script>
-        const showMoreBtn = document.getElementById('show-more-btn');
-        const recommendationsTbody = document.getElementById('recommendations-tbody');
+      const showMoreBtn = document.getElementById("show-more-btn");
+      const recommendationsTbody = document.getElementById("recommendations-tbody");
+      const loadingAnimation = document.getElementById("loading-animation");
 
-        if (showMoreBtn) {
-            showMoreBtn.addEventListener('click', async function() {
-                const mood = this.dataset.mood;
-                let offset = parseInt(this.dataset.offset); // Ambil offset saat ini
-                const batchSize = parseInt(this.dataset.batchSize);
+      if (showMoreBtn) {
+        showMoreBtn.addEventListener("click", async function () {
+          const mood = this.dataset.mood;
+          let offset = parseInt(this.dataset.offset);
+          const batchSize = parseInt(this.dataset.batchSize);
+          this.disabled = true;
+          this.setAttribute("aria-busy", "true");
+          loadingAnimation.classList.remove("hidden");
 
-                // Nonaktifkan tombol selama loading
-                this.disabled = true;
-                this.textContent = 'Loading...';
-
-                try {
-                    // Panggil API endpoint baru
-                    const response = await fetch(`/api/recommendations?mood=${encodeURIComponent(mood)}&offset=${offset}`);
-
-                    if (!response.ok) {
-                        // Tangani error HTTP
-                        console.error('Error fetching recommendations:', response.statusText);
-                        this.textContent = 'Error loading. Try again?';
-                        this.disabled = false; // Aktifkan lagi agar bisa coba lagi
-                        return; // Hentikan proses
-                    }
-
-                    const data = await response.json();
-
-                    if (data.error) {
-                         console.error('API Error:', data.error);
-                         this.textContent = 'Error from server.';
-                         // Jangan aktifkan tombol lagi jika error server
-                         return;
-                    }
-
-
-                    if (data.recommendations && data.recommendations.length > 0) {
-                        // Tambahkan baris baru ke tabel
-                        data.recommendations.forEach(song => {
-                            const newRow = document.createElement('tr');
-                            // --- BAGIAN YANG DIPERBAIKI ---
-                            newRow.innerHTML = `
-                                <td class="track-cell" title="${escapeHtml(song.track_name || '')}">
-                                    <span>${escapeHtml(song.track_name || '')}</span>
-                                    ${song.track_id ? `
-                                   <a href="https://open.spotify.com/track/${song.track_id}" target="_blank" class="spotify-link spotify-icon-link" title="Listen on Spotify">
-    <img src="/static/icons/spotify_icon.png" alt="Listen on Spotify" class="spotify-png-icon">
-</a>` : ''}
-                                </td>
-                                <td>${escapeHtml(song.artists || '')}</td>
-                                <td>${escapeHtml(song.album_name || '')}</td>
-                                <td>${escapeHtml(song.track_genre || '')}</td>
-                                <td>${song.popularity !== null ? song.popularity : ''}</td>
-                            `;
-                            // --- AKHIR BAGIAN YANG DIPERBAIKI ---
-                            recommendationsTbody.appendChild(newRow);
-                        });
-
-                        // Update offset untuk klik berikutnya
-                        const newOffset = offset + data.recommendations.length;
-                        this.dataset.offset = newOffset;
-
-                        // Jika API mengatakan tidak ada lagi lagu (has_more is false)
-                        if (!data.has_more) {
-                            this.textContent = 'No More Songs';
-                            this.disabled = true; // Nonaktifkan permanen
-                        } else {
-                            // Jika masih ada, aktifkan lagi tombolnya
-                            this.textContent = 'Show More';
-                            this.disabled = false;
-                        }
-
-                    } else {
-                        // Jika tidak ada rekomendasi lagi dari API
-                        this.textContent = 'No More Songs';
-                        this.disabled = true; // Nonaktifkan permanen
-                    }
-
-                } catch (error) {
-                    console.error('Failed to fetch more recommendations:', error);
-                    this.textContent = 'Error loading. Try again?';
-                    this.disabled = false;
-                }
-            });
-        }
-
-        // Helper function untuk mencegah XSS sederhana saat memasukkan data ke HTML
-        function escapeHtml(unsafe) {
-            if (typeof unsafe !== 'string') {
-                return unsafe;
+          try {
+            const response = await fetch(`/api/recommendations?mood=${encodeURIComponent(mood)}&offset=${offset}`);
+            if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
+            const data = await response.json();
+            if (data.error) {
+              const errorDiv = document.createElement("div");
+              errorDiv.className = "mt-4 p-4 bg-red-50 rounded-xl border border-red-200 text-red-500 text-center";
+              errorDiv.textContent = data.error;
+              recommendationsTbody.parentElement.after(errorDiv);
+              this.textContent = "Error from server.";
+              return;
             }
-            // Perbaikan: Kembalikan ke versi escape asli yang lebih aman
-            return unsafe
-                 .replace(/&/g, "&")
-                 .replace(/</g, "<")
-                 .replace(/>/g, ">")
-                 .replace(/"/g, '"')
-                 .replace(/'/g, "'");
-        }
+            if (data.recommendations && data.recommendations.length > 0) {
+              data.recommendations.forEach((song, index) => {
+                const newRow = document.createElement("tr");
+                newRow.className = "recommendation-row border-b border-gray-100 last:border-0 opacity-0";
+                newRow.innerHTML = `
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 truncate" title="${escapeHtml(song.track_name || "")}">${escapeHtml(song.track_name || "")}</div>
+                      ${song.track_id ? `
+                        <a href="https://open.spotify.com/track/${song.track_id}" target="_blank" class="spotify-hover flex-shrink-0" title="Listen on Spotify">
+                          <img src="/static/icons/spotify_icon.png" alt="Spotify" class="w-5 h-5 object-contain" />
+                        </a>` : ""}
+                    </div>
+                  </td>
+                  <td class="px-4 py-3 truncate">${escapeHtml(song.artists || "")}</td>
+                  <td class="px-4 py-3 truncate hidden md:table-cell">${escapeHtml(song.album_name || "")}</td>
+                  <td class="px-4 py-3 truncate hidden lg:table-cell">${escapeHtml(song.track_genre || "")}</td>
+                  <td class="px-4 py-3 text-center">
+                    <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary bg-opacity-10 text-primary">
+                      ${song.popularity !== null ? song.popularity : ""}
+                    </div>
+                  </td>
+                `;
+                recommendationsTbody.appendChild(newRow);
+                setTimeout(() => {
+                  newRow.classList.add("transition-opacity", "duration-500");
+                  newRow.classList.remove("opacity-0");
+                  newRow.classList.add("opacity-100");
+                }, 50 * index);
+              });
+              const newOffset = offset + data.recommendations.length;
+              this.dataset.offset = newOffset;
+              if (!data.has_more) {
+                this.textContent = "No More Songs";
+                this.disabled = true;
+                this.classList.add("opacity-70");
+              } else {
+                this.textContent = "Show More";
+                this.disabled = false;
+              }
+            } else {
+              this.textContent = "No More Songs";
+              this.disabled = true;
+              this.classList.add("opacity-70");
+            }
+          } catch (error) {
+            console.error("Failed to fetch more recommendations:", error);
+            const errorDiv = document.createElement("div");
+            errorDiv.className = "mt-4 p-4 bg-red-50 rounded-xl border border-red-200 text-red-500 text-center";
+            errorDiv.textContent = `Error loading more songs: ${error.message}`;
+            recommendationsTbody.parentElement.after(errorDiv);
+            this.textContent = "Error loading. Try again?";
+            this.disabled = false;
+          } finally {
+            loadingAnimation.classList.add("hidden");
+            this.setAttribute("aria-busy", "false");
+          }
+        });
+      }
 
+      // Helper function to prevent XSS
+      function escapeHtml(unsafe) {
+        if (typeof unsafe !== "string") return unsafe;
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
     </script>
-
-</body>
+  </body>
 </html>

@@ -1,0 +1,262 @@
+/* Import Google Fonts (Contoh: Poppins untuk body, Montserrat untuk headings) */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+    /* Definisikan palet warna cozy */
+    --primary-color: #6a4f9a; /* Ungu lembut */
+    --primary-hover: #523d7a; /* Ungu lebih gelap */
+    --secondary-color: #a88cd3; /* Lavender muda */
+    --background-start: #f2eef8; /* Off-white keunguan */
+    --background-end: #e6e0f0;   /* Sedikit lebih gelap */
+    --text-color: #333;
+    --text-light: #555;
+    --container-bg: rgba(255, 255, 255, 0.9); /* Putih sedikit transparan jika pakai image bg */
+    --container-bg-solid: #ffffff; /* Putih solid jika pakai gradient bg */
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --spotify-green: #1DB954;
+}
+
+body {
+    font-family: 'Poppins', sans-serif; /* Font utama */
+    font-weight: 300;
+    line-height: 1.7;
+    margin: 0;
+    padding: 0; /* Hapus padding default body */
+    color: var(--text-color);
+    /* Background Gradient Lembut */
+    background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+    background-attachment: fixed; /* Agar gradient tidak scroll */
+
+    /* OPSI BACKGROUND GAMBAR (Jika Anda punya gambar cozy): */
+    /* background-image: url('../images/your-cozy-background.jpg'); */ /* Ganti path ke gambar Anda */
+    /* background-size: cover; */
+    /* background-position: center center; */
+    /* background-repeat: no-repeat; */
+    /* background-attachment: fixed; */
+}
+
+.container {
+    max-width: 950px;
+    margin: 40px auto; /* Beri jarak atas bawah */
+    padding: 40px; /* Lebih banyak padding */
+    /* Gunakan background solid jika pakai gradient body */
+    background-color: var(--container-bg-solid);
+    /* Gunakan background transparan jika pakai image body */
+    /* background-color: var(--container-bg); */
+    box-shadow: 0 5px 20px var(--shadow-color); /* Shadow lebih halus */
+    border-radius: 15px; /* Sudut lebih tumpul */
+    backdrop-filter: blur(5px); /* Efek blur jika pakai image bg (opsional) */
+    -webkit-backdrop-filter: blur(5px); /* Untuk Safari */
+}
+
+h1 {
+    font-family: 'Montserrat', sans-serif; /* Font heading */
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+h2 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--primary-hover);
+    border-bottom: 1px solid #eee; /* Garis lebih tipis */
+    padding-bottom: 8px;
+    margin-top: 35px;
+    margin-bottom: 25px;
+    font-weight: 400; /* Tidak terlalu tebal */
+}
+
+p {
+    text-align: center;
+    margin-bottom: 35px;
+    color: var(--text-light);
+    font-size: 1.05em;
+}
+
+.mood-selector {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Jarak antar tombol lebih besar */
+}
+
+.mood-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 25px; /* Padding disesuaikan */
+    border-radius: 30px; /* Sangat bulat */
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 400;
+    transition: all 0.3s ease; /* Transisi lebih halus */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 140px;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.mood-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-3px); /* Efek naik sedikit */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Shadow lebih jelas saat hover */
+}
+
+.mood-button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.mood-icon {
+    width: 22px;
+    height: 22px;
+    vertical-align: middle;
+    opacity: 0.9;
+}
+
+.recommendations-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    font-size: 0.95em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Shadow halus pada tabel */
+    border-radius: 8px; /* Sudut tumpul tabel */
+    overflow: hidden; /* Agar radius terlihat */
+}
+
+.recommendations-table th,
+.recommendations-table td {
+    border: none; /* Hapus border internal */
+    border-bottom: 1px solid var(--border-color); /* Hanya border bawah */
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle; /* Sejajarkan vertikal */
+}
+
+.recommendations-table th {
+    background-color: var(--background-start); /* Header senada background */
+    color: var(--primary-hover);
+    font-weight: 600; /* Sedikit lebih tebal */
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+/* Hilangkan border bawah pada baris terakhir body */
+.recommendations-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.recommendations-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.recommendations-table tbody tr:nth-child(even) {
+    background-color: #fdfaff; /* Zebra striping sangat halus */
+}
+
+.recommendations-table tbody tr:hover {
+    background-color: var(--background-end); /* Highlight saat hover */
+}
+
+/* Styling untuk sel nama lagu dan ikon Spotify */
+.track-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px; /* Jarak antara teks dan ikon */
+    max-width: 300px; /* Batasi lebar */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.track-cell span { /* Teks nama lagu */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-grow: 1; /* Biarkan teks mengambil ruang */
+}
+
+
+.spotify-png-icon {
+    width: 20px;   /* Sesuaikan ukuran jika perlu */
+    height: 20px;  /* Sesuaikan ukuran jika perlu */
+    vertical-align: middle; /* Agar sejajar dengan teks */
+    transition: opacity 0.3s ease, transform 0.2s ease; /* Transisi halus */
+    opacity: 0.85; /* Sedikit redup normalnya */
+    flex-shrink: 0; /* Mencegah ikon menyusut */
+}
+
+.spotify-icon-link:hover .spotify-png-icon {
+    opacity: 1.0; /* Jadi jelas saat hover */
+    transform: scale(1.1); /* Sedikit membesar saat hover (opsional) */
+}
+
+
+/* Tombol Show More */
+.show-more-container {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+#show-more-btn {
+    background-color: var(--secondary-color); /* Warna lavender */
+    color: var(--primary-hover);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+#show-more-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+#show-more-btn:disabled {
+    background-color: #e0e0e0; /* Abu-abu jika nonaktif */
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+
+.error-message {
+    color: #d9534f;
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    padding: 15px;
+    border-radius: 8px; /* Sudut tumpul */
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.back-link {
+    margin-top: 35px;
+    text-align: center;
+}
+
+.back-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 18px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.back-link a:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}

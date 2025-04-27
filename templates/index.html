@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Melodies - Select Mood</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Mood Melodies</h1>
+        <p>How are you feeling right now? Choose a mood to get music recommendations!</p>
+
+        <form action="{{ url_for('recommend') }}" method="post" class="mood-selector">
+            {% for mood in moods %}
+            <button type="submit" name="mood" value="{{ mood }}" class="mood-button">
+                <img src="{{ url_for('static', filename='icons/' + mood.lower() + '.png') }}" alt="{{ mood }}" class="mood-icon">
+                <span>{{ mood }}</span>
+            </button>
+            {% endfor %}
+        </form>
+    </div>
+</body>
+</html>

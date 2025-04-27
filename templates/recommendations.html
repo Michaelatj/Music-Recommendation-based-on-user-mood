@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Link Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+        <!-- Judul Halaman (bisa dinamis seperti ini) -->
+        <title>Mood Melodies - Recommendations for {{ selected_mood or '...' }}</title>
+        <!-- Link ke file CSS Eksternal -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+<body>
+    <div class="container">
+        <h1>Mood Melodies</h1>
+
+        {% if error %}
+            <h2>Oops!</h2>
+            <p class="error-message">{{ error }}</p>
+        {% elif recommendations is not none and not recommendations.empty %}
+            <h2>Recommendations for: {{ selected_mood }}</h2>
+            <p>Here are some tracks that might fit your mood:</p>
+            <table class="recommendations-table">
+                <thead>
+                    <tr>
+                        <th>Track Name</th>
+                        <th>Artist(s)</th>
+                        <th>Album</th>
+                        <th>Genre</th>
+                        <th>Popularity</th>
+                    </tr>
+                </thead>
+                <!-- Tambahkan ID ke tbody untuk target JavaScript -->
+                <tbody id="recommendations-tbody">
+                    {% for index, row in recommendations.iterrows() %}
+                    <tr>
+                        <!-- Modifikasi sel nama lagu -->
+                        <td class="track-cell" title="{{ row['track_name'] }}"> <!-- Tambahkan title untuk tooltip -->
+                            <span>{{ row['track_name'] }}</span>
+<!-- Tautan Spotify dengan ikon PNG -->
+<a href="https://open.spotify.com/track/{{ row['track_id'] }}" target="_blank" class="spotify-link spotify-icon-link" title="Listen on Spotify">
+    <!-- Path sudah diperbaiki ke folder icons -->
+    <img src="{{ url_for('static', filename='icons/spotify_icon.png') }}" alt="Listen on Spotify" class="spotify-png-icon">
+</a>
+                        </td>
+                        <td>{{ row['artists'] }}</td>
+                        <td>{{ row['album_name'] }}</td>
+                        <td>{{ row['track_genre'] }}</td>
+                        <td>{{ row['popularity'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Tombol Show More (hanya tampil jika show_more=True) -->
+            {% if show_more %}
+            <div class="show-more-container">
+                <button id="show-more-btn" data-mood="{{ selected_mood }}" data-offset="{{ initial_count }}" data-batch-size="{{ load_more_count }}">
+                    Show More
+                </button>
+            </div>
+            {% endif %}
+
+        {% elif selected_mood %}
+             <!-- Kasus fallback jika recommendations None tapi tidak ada error -->
+             <h2>No Recommendations Found</h2>
+             <p>We couldn't find any suitable tracks for the mood '{{ selected_mood }}' right now.</p>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">← Choose another mood</a>
+        </div>
+    </div>
+
+    <!-- JavaScript untuk Show More -->
+    <script>
+        const showMoreBtn = document.getElementById('show-more-btn');
+        const recommendationsTbody = document.getElementById('recommendations-tbody');
+
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', async function() {
+                const mood = this.dataset.mood;
+                let offset = parseInt(this.dataset.offset); // Ambil offset saat ini
+                const batchSize = parseInt(this.dataset.batchSize);
+
+                // Nonaktifkan tombol selama loading
+                this.disabled = true;
+                this.textContent = 'Loading...';
+
+                try {
+                    // Panggil API endpoint baru
+                    const response = await fetch(`/api/recommendations?mood=${encodeURIComponent(mood)}&offset=${offset}`);
+
+                    if (!response.ok) {
+                        // Tangani error HTTP
+                        console.error('Error fetching recommendations:', response.statusText);
+                        this.textContent = 'Error loading. Try again?';
+                        this.disabled = false; // Aktifkan lagi agar bisa coba lagi
+                        return; // Hentikan proses
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                         console.error('API Error:', data.error);
+                         this.textContent = 'Error from server.';
+                         // Jangan aktifkan tombol lagi jika error server
+                         return;
+                    }
+
+
+                    if (data.recommendations && data.recommendations.length > 0) {
+                        // Tambahkan baris baru ke tabel
+                        data.recommendations.forEach(song => {
+                            const newRow = document.createElement('tr');
+                            // --- BAGIAN YANG DIPERBAIKI ---
+                            newRow.innerHTML = `
+                                <td class="track-cell" title="${escapeHtml(song.track_name || '')}">
+                                    <span>${escapeHtml(song.track_name || '')}</span>
+                                    ${song.track_id ? `
+                                   <a href="https://open.spotify.com/track/${song.track_id}" target="_blank" class="spotify-link spotify-icon-link" title="Listen on Spotify">
+    <img src="/static/icons/spotify_icon.png" alt="Listen on Spotify" class="spotify-png-icon">
+</a>` : ''}
+                                </td>
+                                <td>${escapeHtml(song.artists || '')}</td>
+                                <td>${escapeHtml(song.album_name || '')}</td>
+                                <td>${escapeHtml(song.track_genre || '')}</td>
+                                <td>${song.popularity !== null ? song.popularity : ''}</td>
+                            `;
+                            // --- AKHIR BAGIAN YANG DIPERBAIKI ---
+                            recommendationsTbody.appendChild(newRow);
+                        });
+
+                        // Update offset untuk klik berikutnya
+                        const newOffset = offset + data.recommendations.length;
+                        this.dataset.offset = newOffset;
+
+                        // Jika API mengatakan tidak ada lagi lagu (has_more is false)
+                        if (!data.has_more) {
+                            this.textContent = 'No More Songs';
+                            this.disabled = true; // Nonaktifkan permanen
+                        } else {
+                            // Jika masih ada, aktifkan lagi tombolnya
+                            this.textContent = 'Show More';
+                            this.disabled = false;
+                        }
+
+                    } else {
+                        // Jika tidak ada rekomendasi lagi dari API
+                        this.textContent = 'No More Songs';
+                        this.disabled = true; // Nonaktifkan permanen
+                    }
+
+                } catch (error) {
+                    console.error('Failed to fetch more recommendations:', error);
+                    this.textContent = 'Error loading. Try again?';
+                    this.disabled = false;
+                }
+            });
+        }
+
+        // Helper function untuk mencegah XSS sederhana saat memasukkan data ke HTML
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') {
+                return unsafe;
+            }
+            // Perbaikan: Kembalikan ke versi escape asli yang lebih aman
+            return unsafe
+                 .replace(/&/g, "&")
+                 .replace(/</g, "<")
+                 .replace(/>/g, ">")
+                 .replace(/"/g, '"')
+                 .replace(/'/g, "'");
+        }
+
+    </script>
+
+</body>
+</html>

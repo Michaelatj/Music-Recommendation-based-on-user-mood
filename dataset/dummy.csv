@@ -1,0 +1,11 @@
+track_id,artists,album_name,track_name,popularity,duration_ms,explicit,danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo,time_signature,correct_mood
+5SuOikwiRyPMVoIQDJUgSV,"Gen Hoshino","Comedy","Comedy",73,230666,False,0.676,0.4610,1,-6.746,0,0.1430,0.0322,0.000001,0.3580,0.715,87.917,4,"Relaxed"
+4qPNDBW1i3p13qLCt0Ki3A,"Ben Woodward","Ghost (Acoustic)","Ghost - Acoustic",55,149610,False,0.420,0.1660,1,-17.235,1,0.0763,0.9240,0.000006,0.1010,0.267,77.489,4,"Sad"
+1iJBSr7s7jYXzM8EGcbK5b,"Ingrid Michaelson;ZAYN","To Begin Again","To Begin Again",57,210826,False,0.438,0.3590,0,-9.734,1,0.0557,0.2100,0.000000,0.1170,0.120,76.332,4,"Sad"
+6lfxq3CG4xtTiEg7opyCyx,"Kina Grannis","Crazy Rich Asians (Original Motion Picture Soundtrack)","Can't Help Falling In Love",71,201933,False,0.266,0.0596,0,-18.515,1,0.0363,0.9050,0.000071,0.1320,0.143,181.740,3,"Sad"
+5vjLSffimiIP26QG5WcN2K,"Chord Overstreet","Hold On","Hold On",82,198853,False,0.618,0.4430,2,-9.681,1,0.0526,0.4690,0.000000,0.0829,0.167,119.949,4,"Neutral"
+7ytR5pFWmSjzHJIeQkgog4,"Dua Lipa","Future Nostalgia","Don't Start Now",88,183290,False,0.793,0.793,11,-4.521,0,0.0830,0.0125,0.000000,0.0951,0.677,123.950,4,"Happy"
+4RVwu0g32PAqgUiJoXsdNw,"Billie Eilish","WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?","when the party's over",85,196077,False,0.367,0.111,8,-14.084,1,0.0972,0.9780,0.000040,0.0897,0.198,82.648,4,"Sad"
+6WrI0LAC5M1Rw2MnX2ZvEg,"Tiësto","The Business","The Business",80,164000,False,0.798,0.620,7,-7.079,0,0.2320,0.4140,0.019200,0.1120,0.235,120.031,4,"Anger"
+2takcwOaAZWiXQijPHIx7B,"Linkin Park","Meteora","Numb",86,185586,False,0.496,0.863,8,-4.116,1,0.0413,0.0061,0.000000,0.6390,0.243,110.018,4,"Anger"
+1IX47gefluXmXKzrU4G66X,"Khalid","American Teen","Location",84,219146,True,0.736,0.449,1,-11.746,0,0.4220,0.0751,0.000431,0.0893,0.326,80.035,4,"Neutral"

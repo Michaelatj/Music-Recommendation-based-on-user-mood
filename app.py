@@ -9,7 +9,7 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'models', 'mood_model.joblib')
 SCALER_PATH = os.path.join(BASE_DIR, 'models', 'mood_scaler.joblib')
-DATA_PATH = os.path.join(BASE_DIR, 'dataset', 'music_data.csv')
+DATA_PATH = os.path.join(BASE_DIR, 'dataset', 'cleaned_data.csv')
 
 FEATURES = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
             'instrumentalness', 'liveness', 'valence', 'tempo', 'mode', 'duration_ms']
